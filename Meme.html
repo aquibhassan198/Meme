@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 16px;
+            text-align: center;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .meme-container {
+            margin-top: 16px;
+            max-width: 440px;
+            margin-inline: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.25) ;
+        }
+
+        .meme-title {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .author {
+            margin-bottom: 0;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .vote-button {
+            border: none;
+            font: inherit;
+            padding: 8px 12px;
+            background-color: brown;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .vote-button:active {
+            background-color: #057c68;
+        }
+
+        img {
+            width: 100%;
+            border-radius: 8px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        img:not([src]) {
+            display: none;
+        }
+
+        .vote-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .vote-count {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .next-button {
+            border: none;
+            font: inherit;
+            padding: 12px 16px;
+            background-color: brown;
+            background-color: #069179;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .next-button:hover {
+            background-color: #057c68;
+        }
+    </style>
+</head>
+<body>
+    <button class="next-button">Generate Meme</button>
+
+    <div class="meme-container">
+        <h1 class="meme-title">Loading...</h1>
+        <img class="meme-image" />
+        <p class="author"></p>
+        <div class="vote-box">
+            <span class="vote-count">0 votes</span>
+            <button class="vote-button">Vote</button>
+        </div>
+    </div>
+   
+
+    <script>
+        const memeTitle = document.querySelector('.meme-title');
+        const memeImage = document.querySelector('.meme-image');
+        const authorOutput = document.querySelector('.author');
+        const voteButton = document.querySelector('.vote-button');
+        const voteCountOutput = document.querySelector('.vote-count');
+        const nextButton = document.querySelector('.next-button');
+
+        let voteCounts = {}; // Object to store vote counts for each meme
+
+        function getMeme() {
+            fetch('https://meme-api.com/gimme/wholesomememes')
+                .then((res) => res.json())
+                .then((data) => {
+                    const { id, author, title, url } = data;
+                    memeTitle.innerText = title;
+                    memeImage.src = url;
+                    authorOutput.innerText = `Meme by: ${author}`;
+                    // Initialize vote count for this meme if it doesn't exist
+                    if (!voteCounts[id]) {
+                        voteCounts[id] = 0;
+                    }
+                    voteCountOutput.textContent = `${voteCounts[id]} votes`;
+                });
+        }
+
+        function voteForMeme() {
+            const id = memeImage.src; // Use meme URL as unique identifier
+            voteCounts[id] = (voteCounts[id] || 0) + 1;
+            voteCountOutput.textContent = `${voteCounts[id]} votes`;
+        }
+
+        voteButton.addEventListener('click', voteForMeme);
+
+        nextButton.addEventListener('click', getMeme);
+
+        getMeme(); // Load the initial meme
+    </script>
+</body>
+</html>
+
